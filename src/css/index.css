@@ -4,7 +4,6 @@
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
     color: #00C044;
-    
 }
 
 
@@ -16,6 +15,11 @@ body {
    
 header {
     display: flex;
+    flex-direction: column;
+}
+
+.app-title {
+    display: flex;
 }
 
 .logo img {
@@ -25,26 +29,29 @@ header {
 .logo img:hover {
     filter: hue-rotate(130deg);
 }
+
 h1 {
     text-align: center;
-    padding-left: 30px;
+    padding-left: 10px;
     font-size: 34px;
+    margin: auto 0;
 } 
-nav {
-    margin-left: 20px;
-}
 
-nav ul {
-    list-style: none;
-}
-.container {
+.bookmark-controls {
     display: flex;
-    flex-direction: column;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
 }
 
-h1 {
-    margin: 30px 0;
+button {
+    font-size: 20px;
+    margin: 10px;
+    padding: 15px;
+    background-color: darkblue;
+    border: 2px solid darkorange;
+    border-radius: 15px;
 }
+
 a {
     display: block;
     margin-top: 20px;
@@ -64,9 +71,6 @@ main {
     margin-left: 20px;
 }
 
-.container img {
-    width: 30%;
-}
 
 
 
