@@ -37,6 +37,16 @@ const generateAddNewBookmarkString = function () {
         <label for="url">URL</label>
         <input type="text" id="url">
       </div>
+
+      <div>
+      <label for="rating">Rating</label>
+      <input type="number" id="rating">
+    </div>
+
+    <div>
+    <label for="desc">Description</label>
+    <input type="text" id="desc">
+  </div>
     
 
       <input type="submit" id="addBookmark" value="Add Bookmark">
@@ -95,12 +105,49 @@ const handleBackToListButton = function () {
   });
 };
 
+const handleAddNewBookmarkSubmit = function () {
+  // The event of clicking the submit button
+  $('main').on('click', '#addBookmark', (event) => {
+    event.preventDefault();
+  
+    // storing the input fields as variables
+    const newBookmarkTitle = $('#title').val();
+    $('#title').val('');
+
+    const newBookmarkUrl = $('#url').val();
+    $('#url').val('');
+
+    const newBookmarkRating = $('#rating').val();
+    $('#rating').val('');
+
+    const newBookmarkDesc = $('#desc').val();
+    $('#desc').val('');
+
+    api.createBookmark(newBookmarkTitle, newBookmarkUrl, newBookmarkRating, newBookmarkDesc)
+      .then(res => {
+        if(res.ok){
+          return res.json();
+        }
+        throw new TypeError('error: something bad happened with the POST');
+      })
+      .then((newBookmark) => {
+        store.addBookmark(newBookmark);
+        render();
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+
+  });
+};
+
 
 // bind all the event listeners to export
 
 const bindEventListeners = function () {
   handleAddBookmarkButton();
   handleBackToListButton();
+  handleAddNewBookmarkSubmit();
 };
 
 export default {
