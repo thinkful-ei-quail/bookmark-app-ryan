@@ -1,8 +1,14 @@
 const BASE_URL = 'https://thinkful-list-api.herokuapp.com/warptrail';
 
-function getBookmarks () {
+const getBookmarks = function () {
   return fetch(`${BASE_URL}/bookmarks/`);
-}
+};
+
+// Add a new bookmark by POST to api
+const createBookmark = function () {
+
+};
+
 
 export default {
   getBookmarks

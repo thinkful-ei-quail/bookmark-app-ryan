@@ -7,8 +7,6 @@ import store from './store';
 import api from './api';
 
 // HTML generators that the render function will use
-
-
 // generate the title for a bookmark
 const generateBookmarkElement = function (bookmark) {
   // console.log(bookmark, 'is passed in from the map');
@@ -21,47 +19,91 @@ const generateBookmarkElement = function (bookmark) {
   return bookmarkElement;
 };
 
-// for each bookmark in the list, 
-// generate a string for it, 
-// and merge them into the list string
-
-/* 
-const generateBookmarkListString = function (bookmarkList) {
-  console.log(bookmarkList, 'is an an array with an object in it');
-  const bookmarks = bookmarkList.map((bookmark) => {
-    console.log(bookmark, '26');
-    return generateBookmarkElement(bookmark);
-  });
-  console.log(bookmarks); // !!! returning [undefined] !!!
-  console.log(bookmarks.join(''), '???');
-  return bookmarks.join('');
-};
-*/
 
 const generateBookmarkListString = function (bookmarkList) {
   const bookmarks = bookmarkList.map(bookmark => generateBookmarkElement(bookmark));
-  console.log(bookmarkList, '39');
   return bookmarks;
 };
 
+const generateAddNewBookmarkString = function () {
+  return `
+    <form>
+      <div>
+        <label for="title">Title</label>
+        <input type="text" id="title">
+      </div>
+      
+      <div>
+        <label for="url">URL</label>
+        <input type="text" id="url">
+      </div>
+    
 
+      <input type="submit" id="addBookmark" value="Add Bookmark">
+    </form>
+    <button id="backToList">Back to List</button>
+    `;
+};
+
+// Controller functions
+const addingNewBookmark = function () {
+  store.adding = true;
+};
+
+const backToBookmarkList = function () {
+  store.adding = false;
+};
 
 
 // Render the page dependent on what's in the store
 
 const render = function () {
+  let visibleString = '';
   let bookmarks = [...store.bookmarks];
-  console.log(bookmarks, 'from the render');
-
+  
   // render the bookmark list in the DOM
   const bookmarkListString = generateBookmarkListString(bookmarks);
-  console.log(bookmarkListString);
+  const addNewBookmarkString = generateAddNewBookmarkString();
 
+  if (store.adding === false) {
+    visibleString = bookmarkListString;
+  } else {
+    visibleString = addNewBookmarkString;
+  }
+  
   // insert that HTML into the DOM
-  $('main').html(bookmarkListString);
+  $('main').html(visibleString);
 
 };
 
+// Handler functions
+
+const handleAddBookmarkButton = function () {
+  $('header').on('click', '#addBookmark', (event) => {
+    event.preventDefault();
+    addingNewBookmark();
+    render();
+  });
+};
+
+
+const handleBackToListButton = function () {
+  $('main').on('click', '#backToList', (event) => {
+    event.preventDefault();
+    backToBookmarkList();
+    render();
+  });
+};
+
+
+// bind all the event listeners to export
+
+const bindEventListeners = function () {
+  handleAddBookmarkButton();
+  handleBackToListButton();
+};
+
 export default {
-  render
+  render,
+  bindEventListeners
 };

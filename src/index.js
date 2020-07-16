@@ -26,7 +26,8 @@ function main() {
       bookmarkList.forEach((bookmark) => store.addBookmark(bookmark));
       bookmarks.render();
     });
-
+  
+  bookmarks.bindEventListeners();
   bookmarks.render();
 }
 
