@@ -12,17 +12,35 @@ const generateBookmarkElement = function (bookmark) {
   // console.log(bookmark, 'is passed in from the map');
   let bookmarkTitle = `<h2 class="bookmark-title">${bookmark.title}</h2>`;
   let bookmarkUrl = `<a href="${bookmark.url}" target="_blank">Visit this site</a>`;
-  let bookmarkRating = `<p>${bookmark.rating}</p>`;
+  let bookmarkRating = `<p>Rating: ${bookmark.rating}</p>`;
   let bookmarkDesc = `<p>${bookmark.desc}</p>`;
-  
-  let bookmarkElement = bookmarkTitle + bookmarkRating + bookmarkDesc + bookmarkUrl;
+
+  let bookmarkElement = `
+    <li class="js-bookmark-element" data-bookmark-id="${bookmark.id}">
+      <div class="bookmark-bubble">
+        ${bookmarkTitle}
+        ${bookmarkUrl}
+        ${bookmarkRating}
+        ${bookmarkDesc}
+      </div>
+      <div>
+      <button class="delete-bookmark">Delete</button>
+      </div>
+    </li>
+  `;
+
+  console.log(typeof bookmarkElement);
   return bookmarkElement;
 };
 
 
 const generateBookmarkListString = function (bookmarkList) {
   const bookmarks = bookmarkList.map(bookmark => generateBookmarkElement(bookmark));
-  return bookmarks;
+  return `
+    <ul>
+      ${bookmarks.join('')}
+    </ul>
+  `;
 };
 
 const generateAddNewBookmarkString = function () {
@@ -70,7 +88,7 @@ const backToBookmarkList = function () {
 const render = function () {
   let visibleString = '';
   let bookmarks = [...store.bookmarks];
-  
+
   // render the bookmark list in the DOM
   const bookmarkListString = generateBookmarkListString(bookmarks);
   const addNewBookmarkString = generateAddNewBookmarkString();
@@ -80,7 +98,7 @@ const render = function () {
   } else {
     visibleString = addNewBookmarkString;
   }
-  
+
   // insert that HTML into the DOM
   $('main').html(visibleString);
 
@@ -109,7 +127,7 @@ const handleAddNewBookmarkSubmit = function () {
   // The event of clicking the submit button
   $('main').on('click', '#addBookmark', (event) => {
     event.preventDefault();
-  
+
     // storing the input fields as variables
     const newBookmarkTitle = $('#title').val();
     $('#title').val('');
@@ -125,7 +143,7 @@ const handleAddNewBookmarkSubmit = function () {
 
     api.createBookmark(newBookmarkTitle, newBookmarkUrl, newBookmarkRating, newBookmarkDesc)
       .then(res => {
-        if(res.ok){
+        if (res.ok) {
           return res.json();
         }
         throw new TypeError('error: something bad happened with the POST');
@@ -141,6 +159,41 @@ const handleAddNewBookmarkSubmit = function () {
   });
 };
 
+// Handle the click the delete button event
+// but first need to link each delete button to its respected bookmark id!
+
+const getBookmarkIdFromElement = function (bookmark) {
+  return $(bookmark)
+    .closest('.js-bookmark-element')
+    .data('bookmark-id');
+};
+
+const handleDeleteBookmarkButton = function () {
+  $('main').on('click', '.delete-bookmark', (event) => {
+    event.preventDefault();
+    console.log('delete!');
+    console.log(event.target);
+
+    const id = getBookmarkIdFromElement(event.currentTarget);
+    console.log(id);
+
+    api.deleteBookmark(id)
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new TypeError('error: unable to delete item');
+      })
+      .then(() => {
+        store.findAndDelete(id);
+        render();
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  });
+};
+
 
 // bind all the event listeners to export
 
@@ -148,6 +201,7 @@ const bindEventListeners = function () {
   handleAddBookmarkButton();
   handleBackToListButton();
   handleAddNewBookmarkSubmit();
+  handleDeleteBookmarkButton();
 };
 
 export default {

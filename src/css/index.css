@@ -55,11 +55,11 @@ button, input[type=submit] {
 
 a {
     display: block;
-    margin-top: 20px;
     text-decoration: none;
     font-size: 20px;
     width: 100%;
     cursor: pointer;
+    color: #B15B21;
 }
 
 a:hover {
@@ -83,6 +83,15 @@ form input {
     
 }
 
+main ul li {
+    margin: 10px;
+    border: 1px solid yellow;
+    padding: 10px;
+    list-style: none;
+}
 
+main ul li .bookmark-bubble > *{
+    margin: 10px;
+}
 
 

@@ -29,8 +29,17 @@ const createBookmark = function (title, url, rating, desc) {
 
 };
 
+// Delete a bookmark in the api
+const deleteBookmark = function(id) {
+  return fetch (`${BASE_URL}/bookmarks/${id}`,
+    {
+      method: 'DELETE'
+    }
+  );
+};
 
 export default {
   getBookmarks,
-  createBookmark
+  createBookmark,
+  deleteBookmark
 };

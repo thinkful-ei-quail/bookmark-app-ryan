@@ -14,6 +14,13 @@ const addBookmark = function (bookmark) {
   this.bookmarks.push(bookmark);
 };
 
+const findAndDelete = function (id) {
+  // This mutates the bookmarks array with a filtered array 
+  // of all bookmarks in the list that are not equal to the id we want to delete
+  this.bookmarks = this.bookmarks.filter(selectedBookmark => selectedBookmark.id !== id);
+  console.log(this.bookmarks);
+};
+
 // exports
 
 export default {
@@ -21,7 +28,8 @@ export default {
   adding,
   error,
   filter,
-  addBookmark
+  addBookmark,
+  findAndDelete
 };
 
 
