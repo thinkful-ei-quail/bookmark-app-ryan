@@ -21,6 +21,8 @@ const findAndDelete = function (id) {
   console.log(this.bookmarks);
 };
 
+
+
 // exports
 
 export default {

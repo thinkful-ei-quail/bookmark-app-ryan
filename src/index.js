@@ -3,7 +3,6 @@ import $ from 'jquery';
 
 // import assets
 import './css/index.css';
-import placeLogo from './modules/images';
 
 // import modules
 import bookmarks from './modules/bookmarks';
@@ -15,7 +14,6 @@ import store from './modules/store';
 function main() {
   console.log('DOM is loaded');
 
-  placeLogo();
   // const startMsg = $('<p>Webpack is working!</p>');
   // $('#root').append(startMsg);
 

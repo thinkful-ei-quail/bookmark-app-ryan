@@ -4,12 +4,27 @@ import cuid from 'cuid';
 
 // import the store and api modules
 import store from './store';
-import api from './api';
+import api from './api'; 
+import logo from '../img/icon-default.ico';
 
 // HTML generators that the render function will use
 // generate the title for a bookmark
+
+const bookmarkHeader = `
+  <header>
+    <div class="app-title">
+      <div class="logo">
+        <img src="${logo}" alt="warptrail logo" class="logo-ico" />
+      </div>
+    <h1>Bookmark collection</h1>
+  </div>
+  </header>`;
+
+
+
 const generateBookmarkElement = function (bookmark) {
   // console.log(bookmark, 'is passed in from the map');
+
   let bookmarkTitle = `<h2 class="bookmark-title">${bookmark.title}</h2>`;
   let bookmarkUrl = `<a href="${bookmark.url}" target="_blank">Visit this site</a>`;
   let bookmarkRating = `<p>Rating: ${bookmark.rating}</p>`;
@@ -37,39 +52,58 @@ const generateBookmarkElement = function (bookmark) {
 const generateBookmarkListString = function (bookmarkList) {
   const bookmarks = bookmarkList.map(bookmark => generateBookmarkElement(bookmark));
   return `
-    <ul>
-      ${bookmarks.join('')}
-    </ul>
+
+  ${bookmarkHeader};
+
+  <main>
+  <div class="bookmark-controls">
+      <button id="showAddBookmarkForm">Add Bookmark</button>
+      <select name="stars" id="stars">
+        <option value = "0"> All </option>
+        <option value = "1"> 1 </option>
+        <option value = "2"> 2 </option>
+        <option value = "3"> 3 </option>
+        <option value = "4"> 4 </option>
+        <option value = "5"> 5 </option>
+      </select>
+  </div>
+
+  <ul>
+    ${bookmarks.join('')}
+  </ul>
+  </main>
   `;
 };
 
 const generateAddNewBookmarkString = function () {
   return `
+  <main>
     <form>
       <div>
-        <label for="title">Title</label>
-        <input type="text" id="title">
+        <label for="bookmark-title">Title</label>
+        <input type="text" name="bookmark-title" id="title" required />
       </div>
       
       <div>
         <label for="url">URL</label>
-        <input type="text" id="url">
+        <input type="text" id="url" name="bookmark-url" required />
       </div>
 
-      <div>
-      <label for="rating">Rating</label>
-      <input type="number" id="rating">
+    <div>
+      <label for="bookmark-rating">Rating</label>
+      <input type="number" id="rating" name="bookmark-rating" required />
     </div>
 
     <div>
-    <label for="desc">Description</label>
-    <input type="text" id="desc">
-  </div>
+      <label for="bookmark-description">Description</label>
+      <input type="text" id="desc" name="bookmark-description" />
+    </div>
     
-
-      <input type="submit" id="addBookmark" value="Add Bookmark">
+      <input type="submit" id="addBookmark" value="add bookmark"/>
     </form>
+
     <button id="backToList">Back to List</button>
+    </main>
     `;
 };
 
@@ -82,6 +116,9 @@ const backToBookmarkList = function () {
   store.adding = false;
 };
 
+const changeStoreFilter = function (filter) {
+  store.filter = filter;
+};
 
 // Render the page dependent on what's in the store
 
@@ -89,25 +126,33 @@ const render = function () {
   let visibleString = '';
   let bookmarks = [...store.bookmarks];
 
+  if(store.filter !== 0) {
+    bookmarks = bookmarks.filter(bookmark => bookmark.rating >= store.filter);
+
+  }
+  console.log(bookmarks, store);
   // render the bookmark list in the DOM
   const bookmarkListString = generateBookmarkListString(bookmarks);
   const addNewBookmarkString = generateAddNewBookmarkString();
 
+  
   if (store.adding === false) {
     visibleString = bookmarkListString;
   } else {
     visibleString = addNewBookmarkString;
   }
 
+  
+
   // insert that HTML into the DOM
-  $('main').html(visibleString);
+  $('#root').html(visibleString);
 
 };
 
 // Handler functions
 
 const handleAddBookmarkButton = function () {
-  $('header').on('click', '#addBookmark', (event) => {
+  $('#root').on('click', '#showAddBookmarkForm', (event) => {
     event.preventDefault();
     addingNewBookmark();
     render();
@@ -116,7 +161,7 @@ const handleAddBookmarkButton = function () {
 
 
 const handleBackToListButton = function () {
-  $('main').on('click', '#backToList', (event) => {
+  $('#root').on('click', '#backToList', (event) => {
     event.preventDefault();
     backToBookmarkList();
     render();
@@ -125,8 +170,9 @@ const handleBackToListButton = function () {
 
 const handleAddNewBookmarkSubmit = function () {
   // The event of clicking the submit button
-  $('main').on('click', '#addBookmark', (event) => {
+  $('#root').on('submit', 'form', (event) => {
     event.preventDefault();
+    console.log(event.target);
 
     // storing the input fields as variables
     const newBookmarkTitle = $('#title').val();
@@ -146,9 +192,10 @@ const handleAddNewBookmarkSubmit = function () {
         if (res.ok) {
           return res.json();
         }
-        throw new TypeError('error: something bad happened with the POST');
+        throw new TypeError('error: bad POST');
       })
       .then((newBookmark) => {
+
         store.addBookmark(newBookmark);
         render();
       })
@@ -169,7 +216,7 @@ const getBookmarkIdFromElement = function (bookmark) {
 };
 
 const handleDeleteBookmarkButton = function () {
-  $('main').on('click', '.delete-bookmark', (event) => {
+  $('#root').on('click', '.delete-bookmark', (event) => {
     event.preventDefault();
     console.log('delete!');
     console.log(event.target);
@@ -194,6 +241,16 @@ const handleDeleteBookmarkButton = function () {
   });
 };
 
+// handle the changing of the select menu to filter by rating
+const handleFilterBookmarksByStars = function () {
+  $('#root').on('change', '#stars', (event) => {
+    console.log(event.target);
+    store.filter = event.target.value;
+    console.log(store.rating);
+    render();
+  });
+};
+
 
 // bind all the event listeners to export
 
@@ -202,6 +259,7 @@ const bindEventListeners = function () {
   handleBackToListButton();
   handleAddNewBookmarkSubmit();
   handleDeleteBookmarkButton();
+  handleFilterBookmarksByStars();
 };
 
 export default {
