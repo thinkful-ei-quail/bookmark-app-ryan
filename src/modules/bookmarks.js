@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 // import jquery and cuid
 import $ from 'jquery';
 import cuid from 'cuid';
@@ -27,18 +28,36 @@ const generateBookmarkElement = function (bookmark) {
 
   let bookmarkTitle = `<h2 class="bookmark-title">${bookmark.title}</h2>`;
   let bookmarkUrl = `<a href="${bookmark.url}" target="_blank">Visit this site</a>`;
-  let bookmarkRating = `<p>Rating: ${bookmark.rating}</p>`;
+  let bookmarkRating = '';
   let bookmarkDesc = `<p>${bookmark.desc}</p>`;
+
+  switch(bookmark.rating) {
+  case bookmark.rating = 1:
+    bookmarkRating = '<p>★</p>';
+    break;
+  case bookmark.rating = 2:
+    bookmarkRating = '<p>★★</p>';
+    break;
+  case bookmark.rating = 3:
+    bookmarkRating = '<p>★★★</p>';
+    break;
+  case bookmark.rating = 4:
+    bookmarkRating = '<p>★★★★</p>';
+    break;
+  case bookmark.rating = 5:
+    bookmarkRating = '<p>★★★★★</p>';
+    break;
+  }
 
   let bookmarkElement = `
     <li class="js-bookmark-element" data-bookmark-id="${bookmark.id}">
       <div class="bookmark-bubble">
         ${bookmarkTitle}
-        ${bookmarkUrl}
         ${bookmarkRating}
-        ${bookmarkDesc}
       </div>
-      <div>
+      <div class="bookmark-expand hidden">
+      ${bookmarkUrl}
+      ${bookmarkDesc}
       <button class="delete-bookmark">Delete</button>
       </div>
     </li>
@@ -49,23 +68,36 @@ const generateBookmarkElement = function (bookmark) {
 };
 
 
+
 const generateBookmarkListString = function (bookmarkList) {
   const bookmarks = bookmarkList.map(bookmark => generateBookmarkElement(bookmark));
+  let filter = store.filter;
+
+  let allResults = '<p>Displaying all ratings</p>';
+  let filterResults = `<p>Displaying ${filter} stars and above</p>`;
+  
   return `
 
-  ${bookmarkHeader};
+  ${bookmarkHeader}
 
   <main>
   <div class="bookmark-controls">
+      <div class="go-to-add-form">
       <button id="showAddBookmarkForm">Add Bookmark</button>
-      <select name="stars" id="stars">
-        <option value = "0"> All </option>
-        <option value = "1"> 1 </option>
-        <option value = "2"> 2 </option>
-        <option value = "3"> 3 </option>
-        <option value = "4"> 4 </option>
-        <option value = "5"> 5 </option>
-      </select>
+      </div>
+      
+      <div class="filter-by-rating"e>
+        <select name="stars" id="stars">
+          <option> Filter by Rating </option>
+          <option value = "0"> All </option>
+          <option value = "1"> ★ </option>
+          <option value = "2"> ★★ </option>
+          <option value = "3"> ★★★ </option>
+          <option value = "4"> ★★★★ </option>
+          <option value = "5"> ★★★★★ </option>
+        </select>
+        ${filter == 0 ? allResults : filterResults}
+      </div>
   </div>
 
   <ul>
@@ -77,6 +109,9 @@ const generateBookmarkListString = function (bookmarkList) {
 
 const generateAddNewBookmarkString = function () {
   return `
+
+  ${bookmarkHeader}
+
   <main>
     <form>
       <div>
@@ -90,13 +125,19 @@ const generateAddNewBookmarkString = function () {
       </div>
 
     <div>
-      <label for="bookmark-rating">Rating</label>
-      <input type="number" id="rating" name="bookmark-rating" required />
+    <label for="rating">Rating</label>
+      <select id="rating">
+        <option value = "1"> ★ </option>
+        <option value = "2"> ★★ </option>
+        <option value = "3" selected> ★★★ </option>
+        <option value = "4"> ★★★★ </option>
+        <option value = "5"> ★★★★★ </option>
+      </select>
     </div>
 
     <div>
       <label for="bookmark-description">Description</label>
-      <input type="text" id="desc" name="bookmark-description" />
+      <textarea id="desc" name="bookmark-description"></textarea>
     </div>
     
       <input type="submit" id="addBookmark" value="add bookmark"/>
@@ -116,9 +157,7 @@ const backToBookmarkList = function () {
   store.adding = false;
 };
 
-const changeStoreFilter = function (filter) {
-  store.filter = filter;
-};
+
 
 // Render the page dependent on what's in the store
 
@@ -197,6 +236,7 @@ const handleAddNewBookmarkSubmit = function () {
       .then((newBookmark) => {
 
         store.addBookmark(newBookmark);
+        store.adding = false;
         render();
       })
       .catch((error) => {
@@ -244,13 +284,22 @@ const handleDeleteBookmarkButton = function () {
 // handle the changing of the select menu to filter by rating
 const handleFilterBookmarksByStars = function () {
   $('#root').on('change', '#stars', (event) => {
-    console.log(event.target);
+    
     store.filter = event.target.value;
-    console.log(store.rating);
+    
     render();
   });
 };
 
+// handle toggling the expanded view of each bookmark
+const handleExpandBookmarkBubble = function () {
+  $('#root').on('click', '.bookmark-bubble', (event) => {
+    const id = getBookmarkIdFromElement(event.currentTarget);
+    console.log('you have clicked ' + id + ' bubble!');
+
+    $(`li[data-bookmark-id=${id}] .bookmark-expand`).toggleClass('hidden');
+  });
+};
 
 // bind all the event listeners to export
 
@@ -260,6 +309,7 @@ const bindEventListeners = function () {
   handleAddNewBookmarkSubmit();
   handleDeleteBookmarkButton();
   handleFilterBookmarksByStars();
+  handleExpandBookmarkBubble();
 };
 
 export default {

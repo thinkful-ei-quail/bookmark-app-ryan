@@ -16,6 +16,7 @@ body {
 header {
     display: flex;
     flex-direction: column;
+    margin-bottom: 20px;
 }
 
 .app-title {
@@ -39,32 +40,45 @@ h1 {
 } 
 
 .bookmark-controls {
-    display: flex;
-    justify-content: space-evenly;
     margin-bottom: 20px;
+}
+
+
+
+.bookmark-controls .filter-by-rating {
+    margin: 10px auto;
+}
+
+.bookmark-controls .filter-by-rating select,
+.bookmark-controls .go-to-add-form button {
+    font-size: 26px;
+    background-color: #23253C;
+    margin-top: 10px;
+    padding: 15px;
+    border: 1px solid darkorange;
+    border-radius: 10px;
+}
+
+.bookmark-controls .filter-by-rating select:hover,
+button:hover,
+input[type=submit]:hover {
+    background-color: #23323C;
+}
+
+.bookmark-controls .filter-by-rating p{
+    margin-top: 12px;
 }
 
 button, input[type=submit] {
     font-size: 20px;
-    margin: 10px;
     padding: 15px;
-    background-color: darkblue;
+    background-color: #23263C;
     border: 2px solid darkorange;
     border-radius: 15px;
-}
-
-a {
-    display: block;
-    text-decoration: none;
-    font-size: 20px;
-    width: 100%;
     cursor: pointer;
-    color: #B15B21;
 }
 
-a:hover {
-    color: #CD00FF;
-}
+
 
 /* MAIN */
 
@@ -77,10 +91,53 @@ form {
     flex-direction: column;
 }
 
-form input {
-    margin: 10px auto;
+form > * {
+    margin: 20px 0;
+}
+
+form input[type=text], 
+form textarea, 
+form select {
+    background-color: #23253C;
+    border: 1px solid darkgoldenrod;
+}
+
+form input[type=text] {
+    padding: 5px;
+    font-size: 20px;
     width: 80%;
-    
+}
+
+form label {
+    font-size: 22px;
+    margin-right: 10px;
+}
+
+form select {
+    width: 80%;
+    max-width: 600px;
+    padding: 10px;
+    font-size: 24px;
+}
+
+form textarea {
+    color: #00C044;
+    height: 4.75rem;
+    width: 90%;
+    max-width: 900px;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+
+form input[type=submit] {
+    width: 50%;
+}
+
+#backToList {
+    font-size: 16px;
 }
 
 main ul li {
@@ -88,10 +145,58 @@ main ul li {
     border: 1px solid yellow;
     padding: 10px;
     list-style: none;
+    border-radius: 12px;
 }
 
-main ul li .bookmark-bubble > *{
+main ul li .bookmark-bubble {
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+main ul li .bookmark-bubble:hover {
+    background-color: #3B3D52;
+}
+
+main ul li .bookmark-bubble > * {
     margin: 10px;
 }
 
+.bookmark-expand p {
+    color: #79FAE7;
+    font-size: 24px;
+   margin: 40px 0 30px 20px;
+}
 
+.bookmark-expand {
+    margin-top: 30px;
+}
+
+.bookmark-expand a {
+    text-decoration: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #00C044;
+    margin: 20px;
+    background-color: #0A2935;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+a:hover {
+    color: #CD00FF;
+    background-color: #221547;
+}
+
+.bookmark-expand button {
+    padding: 8px;
+    color: #A40000;
+    border: 1px dotted #A40000;
+}
+
+.bookmark-expand button:hover {
+    background-color: #320F2C;
+}
+
+.hidden {
+    display: none;
+}
