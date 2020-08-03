@@ -96,7 +96,7 @@ textarea {
 textarea {
   margin: auto;
   padding: 10px;
-  font-size: 20px;
+  font-size: 16px;
   width: 80%;
   font-size: 16px;
 }
@@ -241,15 +241,21 @@ li h2 {
 
   .add-bm {
     flex-direction: row;
+    margin-left: 10px;
   }
 
-  form select {
+  .add-bm input[type='text'] {
+    margin: 0 10px 0 0;
+  }
+
+  #rating {
     width: 200px;
     margin: 0;
     margin-left: 40px;
   }
   textarea {
     width: 80%;
+    margin: 0;
   }
 
   .form-btns > * {
