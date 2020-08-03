@@ -14,9 +14,6 @@ import store from './modules/store';
 function main() {
   console.log('DOM is loaded');
 
-  // const startMsg = $('<p>Webpack is working!</p>');
-  // $('#root').append(startMsg);
-
   // the initial api call to get bookmarks to store    
   api.getBookmarks()
     .then(res => res.json())

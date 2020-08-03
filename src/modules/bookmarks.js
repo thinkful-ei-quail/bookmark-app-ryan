@@ -12,14 +12,11 @@ import logo from '../img/icon-default.ico';
 // generate the title for a bookmark
 
 const bookmarkHeader = `
-  <header>
-    <div class="app-title">
       <div class="logo">
         <img src="${logo}" alt="warptrail logo" class="logo-ico" />
       </div>
     <h1>Bookmark collection</h1>
-  </div>
-  </header>`;
+  `;
 
 
 
@@ -56,7 +53,9 @@ const generateBookmarkElement = function (bookmark) {
         ${bookmarkRating}
       </div>
       <div class="bookmark-expand hidden">
-      ${bookmarkUrl}
+        <div class="bookmark-link">
+        ${bookmarkUrl}
+        </div>
       ${bookmarkDesc}
       <button class="delete-bookmark">Delete</button>
       </div>
@@ -73,22 +72,18 @@ const generateBookmarkListString = function (bookmarkList) {
   const bookmarks = bookmarkList.map(bookmark => generateBookmarkElement(bookmark));
   let filter = store.filter;
 
-  let allResults = '<p>Displaying all ratings</p>';
-  let filterResults = `<p>Displaying ${filter} stars and above</p>`;
+  let allResults = '<p class="display-notification">Displaying all ratings</p>';
+  let filterResults = `<p class="display-notification">Displaying ${filter} stars and above</p>`;
   
   return `
-
-  ${bookmarkHeader}
-
-  <main>
-  <div class="bookmark-controls">
-      <div class="go-to-add-form">
+  <form class="bookmark-controls">
+      <div class="add-bm-btn">
       <button id="showAddBookmarkForm">Add Bookmark</button>
       </div>
       
       <div class="filter-by-rating"e>
+      <label for="stars">Filter by label</label>
         <select name="stars" id="stars">
-          <option> Filter by Rating </option>
           <option value = "0"> All </option>
           <option value = "1"> ★ </option>
           <option value = "2"> ★★ </option>
@@ -96,35 +91,31 @@ const generateBookmarkListString = function (bookmarkList) {
           <option value = "4"> ★★★★ </option>
           <option value = "5"> ★★★★★ </option>
         </select>
-        ${filter == 0 ? allResults : filterResults}
       </div>
-  </div>
+  </form>
 
+  ${filter == 0 ? allResults : filterResults}
   <ul>
     ${bookmarks.join('')}
   </ul>
-  </main>
   `;
 };
 
 const generateAddNewBookmarkString = function () {
   return `
-
-  ${bookmarkHeader}
-
-  <main>
-    <form>
-      <div>
+    <form class="add-bm-form">
+    <div class="error-message"></div>
+      <div class="add-bm">
         <label for="bookmark-title">Title</label>
         <input type="text" name="bookmark-title" id="title" required />
       </div>
       
-      <div>
+      <div class="add-bm">
         <label for="url">URL</label>
         <input type="text" id="url" name="bookmark-url" required />
       </div>
 
-    <div>
+    <div class="add-bm">
     <label for="rating">Rating</label>
       <select id="rating">
         <option value = "1"> ★ </option>
@@ -135,16 +126,20 @@ const generateAddNewBookmarkString = function () {
       </select>
     </div>
 
-    <div>
+    <div class="add-bm">
       <label for="bookmark-description">Description</label>
       <textarea id="desc" name="bookmark-description"></textarea>
     </div>
     
+    <div class="add-bm form-btns">
       <input type="submit" id="addBookmark" value="add bookmark"/>
+      <button type="button" id="backToList">Back to List</button>
+    </div>
+     
+
     </form>
 
-    <button id="backToList">Back to List</button>
-    </main>
+    
     `;
 };
 
@@ -169,7 +164,7 @@ const render = function () {
     bookmarks = bookmarks.filter(bookmark => bookmark.rating >= store.filter);
 
   }
-  console.log(bookmarks, store);
+
   // render the bookmark list in the DOM
   const bookmarkListString = generateBookmarkListString(bookmarks);
   const addNewBookmarkString = generateAddNewBookmarkString();
@@ -184,14 +179,15 @@ const render = function () {
   
 
   // insert that HTML into the DOM
-  $('#root').html(visibleString);
+  $('header').html(bookmarkHeader);
+  $('main').html(visibleString);
 
 };
 
 // Handler functions
 
 const handleAddBookmarkButton = function () {
-  $('#root').on('click', '#showAddBookmarkForm', (event) => {
+  $('main').on('click', '#showAddBookmarkForm', (event) => {
     event.preventDefault();
     addingNewBookmark();
     render();
@@ -200,7 +196,7 @@ const handleAddBookmarkButton = function () {
 
 
 const handleBackToListButton = function () {
-  $('#root').on('click', '#backToList', (event) => {
+  $('main').on('click', '#backToList', (event) => {
     event.preventDefault();
     backToBookmarkList();
     render();
@@ -209,7 +205,7 @@ const handleBackToListButton = function () {
 
 const handleAddNewBookmarkSubmit = function () {
   // The event of clicking the submit button
-  $('#root').on('submit', 'form', (event) => {
+  $('main').on('submit', 'form', (event) => {
     event.preventDefault();
     console.log(event.target);
 
@@ -228,19 +224,20 @@ const handleAddNewBookmarkSubmit = function () {
 
     api.createBookmark(newBookmarkTitle, newBookmarkUrl, newBookmarkRating, newBookmarkDesc)
       .then(res => {
-        if (res.ok) {
-          return res.json();
+        if (!res.ok) {
+          throw Error(res.statusText);
         }
-        throw new TypeError('error: bad POST');
+        return res.json();
       })
       .then((newBookmark) => {
-
         store.addBookmark(newBookmark);
         store.adding = false;
         render();
       })
       .catch((error) => {
-        console.log(error.message);
+        store.adding = true;
+        $('.error-message').html('An error occured. It is likely you entered an invalid URL. Please check your bookmark link and try again.');
+        console.log(error);
       });
 
   });
@@ -256,7 +253,7 @@ const getBookmarkIdFromElement = function (bookmark) {
 };
 
 const handleDeleteBookmarkButton = function () {
-  $('#root').on('click', '.delete-bookmark', (event) => {
+  $('main').on('click', '.delete-bookmark', (event) => {
     event.preventDefault();
     console.log('delete!');
     console.log(event.target);
@@ -283,7 +280,7 @@ const handleDeleteBookmarkButton = function () {
 
 // handle the changing of the select menu to filter by rating
 const handleFilterBookmarksByStars = function () {
-  $('#root').on('change', '#stars', (event) => {
+  $('main').on('change', '#stars', (event) => {
     
     store.filter = event.target.value;
     
@@ -293,7 +290,7 @@ const handleFilterBookmarksByStars = function () {
 
 // handle toggling the expanded view of each bookmark
 const handleExpandBookmarkBubble = function () {
-  $('#root').on('click', '.bookmark-bubble', (event) => {
+  $('main').on('click', '.bookmark-bubble', (event) => {
     const id = getBookmarkIdFromElement(event.currentTarget);
     console.log('you have clicked ' + id + ' bubble!');
 
